@@ -10,19 +10,46 @@ if ('serviceWorker' in navigator) {
 // Install prompt handling
 let deferredPrompt;
 const installBtn = document.getElementById('install-btn');
+const installHelp = document.getElementById('install-help');
+const installHelpClose = document.getElementById('install-help-close');
+
+function isStandalone() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  installBtn.hidden = false;
 });
+
+window.addEventListener('appinstalled', () => {
+  installBtn.classList.add('hidden');
+});
+
+function updateInstallVisibility() {
+  if (isStandalone()) {
+    installBtn.classList.add('hidden');
+  } else {
+    installBtn.classList.remove('hidden');
+  }
+}
+
 installBtn?.addEventListener('click', async () => {
-  installBtn.hidden = true;
   if (deferredPrompt) {
     deferredPrompt.prompt();
     await deferredPrompt.userChoice;
     deferredPrompt = null;
+  } else {
+    // Fallback: show help modal with instructions
+    installHelp?.classList.remove('hidden');
   }
 });
+
+installHelpClose?.addEventListener('click', () => {
+  installHelp?.classList.add('hidden');
+});
+
+updateInstallVisibility();
 
 // Connection status
 const conn = document.getElementById('connection-status');
@@ -62,12 +89,20 @@ function toLi(item) {
 }
 
 function escapeHtml(str) {
-  return String(str)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return String(str).replace(/[&<>"']/g, (ch) => map[ch]);
+}
+
+function upsertLi(item) {
+  const existing = list.querySelector(`li.item[data-id="${item.id}"]`);
+  if (existing) {
+    existing.querySelector('.title').textContent = item.title;
+    existing.querySelector('.details').textContent = item.details || '';
+    return existing;
+  }
+  const li = toLi(item);
+  list.prepend(li);
+  return li;
 }
 
 async function render() {
@@ -82,15 +117,22 @@ form.addEventListener('submit', async (e) => {
   const details = detailsInput.value.trim();
   if (!title) return;
   const id = idInput.value ? Number(idInput.value) : null;
-  if (id) {
-    await updateItem(id, { title, details });
-  } else {
-    await addItem({ title, details });
+  try {
+    if (id) {
+      const updated = await updateItem(id, { title, details });
+      upsertLi(updated);
+    } else {
+      const created = await addItem({ title, details });
+      upsertLi(created);
+    }
+  } catch (err) {
+    console.error(err);
+    // fallback to full render if something unexpected happens
+    await render();
   }
   form.reset();
   idInput.value = '';
   cancelEditBtn.hidden = true;
-  await render();
 });
 
 cancelEditBtn.addEventListener('click', () => {
@@ -107,7 +149,7 @@ list.addEventListener('click', async (e) => {
   const action = btn.dataset.action;
   if (action === 'delete') {
     await deleteItem(id);
-    await render();
+    li.remove();
   } else if (action === 'edit') {
     // Simple fetch from DOM to prefill; could fetch from DB if needed
     const title = li.querySelector('.title').textContent;

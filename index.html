@@ -9,6 +9,8 @@
     <meta name="theme-color" content="#0f766e" />
 
     <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="./icons/apple-icon-180.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
 
     <link rel="stylesheet" href="./styles.css" />
   </head>
@@ -17,7 +19,7 @@
       <h1>DM122 PWA</h1>
       <div class="status">
         <span id="connection-status" class="badge">offline?</span>
-        <button id="install-btn" class="btn" hidden>Instalar</button>
+        <button id="install-btn" class="btn">Instalar</button>
       </div>
     </header>
 
@@ -50,6 +52,25 @@
     <footer class="footer">
       <small>Trabalho DM122 • PWA Offline com IndexedDB</small>
     </footer>
+
+    <!-- Install help modal -->
+    <div id="install-help" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="install-help-title">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="install-help-title">Como instalar</h3>
+          <button id="install-help-close" class="btn" aria-label="Fechar">Fechar</button>
+        </div>
+        <div class="modal-body">
+          <p>Se o botão de instalação nativo não aparecer, siga as instruções:</p>
+          <ul>
+            <li><b>iOS (Safari):</b> toque em Compartilhar → Adicionar à Tela de Início.</li>
+            <li><b>Android (Chrome):</b> menu ⋮ → Instalar app.</li>
+            <li><b>Desktop (Chrome/Edge):</b> ícone de instalação na barra de endereço.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-backdrop"></div>
+    </div>
 
     <script src="./db.js" type="module"></script>
     <script src="./app.js" type="module"></script>

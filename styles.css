@@ -32,6 +32,15 @@ input:focus, textarea:focus { border-color:#334155; box-shadow: 0 0 0 3px rgba(5
 
 .footer { text-align:center; padding:24px 16px; color:#94a3b8; }
 
+/* Modal */
+.hidden { display: none !important; }
+.modal { position: fixed; inset: 0; display: grid; place-items: center; z-index: 50; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.5); backdrop-filter: blur(2px); }
+.modal-content { position: relative; width: min(92vw, 520px); background: #0b1220; border: 1px solid #1f2937; border-radius: 14px; padding: 16px; z-index: 51; }
+.modal-header { display:flex; justify-content: space-between; align-items:center; margin-bottom: 10px; }
+.modal-body ul { margin: 8px 0 0 18px; color:#cbd5e1; }
+.modal-body li { margin: 6px 0; }
+
 @media (prefers-color-scheme: light) {
   :root { --bg:#f8fafc; --text:#0f172a; }
   body { background: linear-gradient(180deg, #f1f5f9, #e2e8f0); }
@@ -39,4 +48,5 @@ input:focus, textarea:focus { border-color:#334155; box-shadow: 0 0 0 3px rgba(5
   .card { background: rgba(255,255,255,.7); border-color:#e2e8f0; }
   input, textarea { background:#fff; border-color:#e2e8f0; color:#0f172a; }
   .badge { background:#e2e8f0; color:#334155; }
+  .modal-content { background:#fff; border-color:#e2e8f0; }
 }
