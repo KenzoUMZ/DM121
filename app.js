@@ -3,7 +3,10 @@ import { addItem, deleteItem, getItems, updateItem } from './db.js';
 // Service Worker registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(console.error);
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .catch(err => {
+        console.error('Erro ao registrar Service Worker:', err);
+      });
   });
 }
 
@@ -29,7 +32,8 @@ window.addEventListener('appinstalled', () => {
 });
 
 function updateInstallVisibility() {
-  if (isStandalone()) {
+  const standalone = isStandalone();
+  if (standalone) {
     installBtn.hidden = true;
   }
 }
@@ -37,10 +41,7 @@ function updateInstallVisibility() {
 installBtn?.addEventListener('click', async () => {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    if (choice.outcome === 'accepted') {
-      console.log('PWA instalado');
-    }
+    await deferredPrompt.userChoice;
     deferredPrompt = null;
     installBtn.hidden = true;
   } else {

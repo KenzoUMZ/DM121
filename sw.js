@@ -1,11 +1,11 @@
-const CACHE_NAME = 'dm122-cache-v1';
+const CACHE_NAME = 'dm122-cache-v2';
 const PRECACHE = [
-  './',
-  './index.html',
-  './styles.css',
-  './app.js',
-  './db.js',
-  './manifest.webmanifest'
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/app.js',
+  '/db.js',
+  '/manifest.webmanifest'
 ];
 
 self.addEventListener('install', (event) => {
@@ -30,7 +30,7 @@ self.addEventListener('fetch', (event) => {
   // Navigation requests: offline-first (serve cached index.html)
   if (req.mode === 'navigate') {
     event.respondWith(
-      caches.match('./index.html').then((cached) => cached || fetch(req))
+      caches.match('/index.html').then((cached) => cached || fetch(req))
     );
     return;
   }
