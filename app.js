@@ -20,25 +20,29 @@ function isStandalone() {
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  installBtn.hidden = false;
 });
 
 window.addEventListener('appinstalled', () => {
-  installBtn.classList.add('hidden');
+  installBtn.hidden = true;
+  deferredPrompt = null;
 });
 
 function updateInstallVisibility() {
   if (isStandalone()) {
-    installBtn.classList.add('hidden');
-  } else {
-    installBtn.classList.remove('hidden');
+    installBtn.hidden = true;
   }
 }
 
 installBtn?.addEventListener('click', async () => {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
+    const choice = await deferredPrompt.userChoice;
+    if (choice.outcome === 'accepted') {
+      console.log('PWA instalado');
+    }
     deferredPrompt = null;
+    installBtn.hidden = true;
   } else {
     // Fallback: show help modal with instructions
     installHelp?.classList.remove('hidden');
